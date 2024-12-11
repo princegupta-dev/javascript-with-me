@@ -28,7 +28,7 @@ HTML (HyperText Markup Language) is used to structure web pages. You'll encounte
   <a href="https://github.com/PrinceGupta" target="_blank">Visit My GitHub</a>
 </body>
 </html>
-
+```
 
 
 ## 🌐 **What is CSS?**
@@ -50,5 +50,5 @@ a {
   text-decoration: none;
   color: #0066cc;
 }
-
+```
 
