@@ -11,6 +11,9 @@ systems do the calculation, so why do we need to request on the server for calcu
 ## What is the means of static
 A static website delivers fixed content to users' browsers. The content is "pre-built" and does not change based on user interaction or input.
 For example: If you want to calculate the sum of two numbers, you request the server using HTML, and then the server returns a new HTML file.
+
+
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
