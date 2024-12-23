@@ -63,6 +63,157 @@ The thread executes JavaScript code.
 The Call Stack organizes and tracks function calls during this execution.
 JavaScript is single-threaded, but the Call Stack is part of the thread’s operation and helps manage the flow of function execution.
 
+## 🔹 1. Call Stack (Execution Context)
+
+What it is: A data structure that tracks function calls.
+How it works:
+When a function is invoked, it’s pushed onto the stack.
+When the function completes, it’s popped off the stack.
+The stack operates in LIFO (Last In, First Out) order.
+Blocking Behavior: If a long-running function (like while(true)) is on the stack, no other code executes.
+
+```javascript
+function a() {
+  b();
+  console.log("a");
+}
+function b() {
+  console.log("b");
+}
+a();
+```
+
+call-stack execution
+
+```javascript
+a() -> b() -> console.log('b') -> console.log('a')
+```
+
+## 🔹 2. Web APIs (Node.js or Browser APIs)
+
+What they are: Asynchronous operations like:
+setTimeout, setInterval
+DOM Events (click, keypress)
+Fetch/HTTP requests
+Timers, File I/O (in Node.js)
+These APIs don’t block the call stack.
+Instead, the operation is handed off to background threads managed by the environment (Node.js/libuv or browser).
+
+```javascript
+console.log("Start");
+setTimeout(() => console.log("Timeout"), 1000);
+console.log("End");
+```
+
+code execution
+
+```javascript
+Call Stack: console.log('Start') -> console.log('End')
+Web API: setTimeout(1000ms)
+```
+
+## 3. Callback Queue / Task Queue
+
+When the Web API finishes (like setTimeout), the callback is placed in the Task Queue (Macrotask Queue).
+Callbacks wait here until the call stack is empty.
+
+## 4. Event Loop (Heart of Asynchronous Execution)
+
+Role: Continuously checks if the call stack is empty. If it is:
+It dequeues the next task from the Task Queue and pushes it to the call stack.
+The event loop ensures JavaScript remains single-threaded yet non-blocking.
+Event Loop Flow:
+
+Look for tasks in the Microtask Queue (Priority).
+If empty, look for tasks in the Macrotask Queue.
+Push the task to the call stack and execute.
+
+## 5. Microtask Queue vs. Macrotask Queue (Execution Order)
+
+Microtasks: Higher priority (executed immediately after the current stack is cleared).
+Examples:
+Promises (.then, .catch, .finally)
+MutationObserver
+queueMicrotask()
+Macrotasks: Lower priority (executed after microtasks).
+Examples:
+setTimeout, setInterval
+setImmediate (Node.js)
+I/O tasks
+
+## Order of Execution (Example):
+
+```c
+console.log('Start');
+
+setTimeout(() => console.log('Timeout'), 0);
+Promise.resolve().then(() => console.log('Promise'));
+
+console.log('End');
+```
+
+```c
+Call Stack: console.log('Start') -> console.log('End')
+Microtask Queue: Promise.then()
+Macrotask Queue: setTimeout()
+
+Output:
+Start
+End
+Promise
+Timeout
+```
+
+## 🔹 Visualizing the Flow
+
+Call Stack (executes sync code)
+Web API (handles async tasks)
+Callback Queue (holds finished async tasks)
+Microtask Queue (Promises are prioritized)
+Event Loop (moves tasks to call stack)
+
+## What is an I/O Task?
+
+I/O (Input/Output) tasks refer to operations that involve interacting with external resources or devices, such as:
+
+Reading/Writing files (File System)
+
+Network requests (HTTP, WebSockets, etc.)
+
+Database queries
+
+User input/output (keyboard/mouse events, console logs)
+
+## How Node.js Handles I/O Tasks:
+
+Node.js uses non-blocking I/O powered by libuv (a C library). When an I/O task is triggered, Node.js:
+
+Hands off the operation to the OS (handled in a separate thread).
+
+Continues executing other code (doesn't block).
+
+Once the I/O task finishes, the callback is queued.
+
+The event loop processes the callback and pushes it to the call stack.
+
+```js
+const fs = require("fs");
+
+console.log("Start");
+fs.readFile("file.txt", "utf8", (err, data) => {
+  console.log(data);
+});
+console.log("End");
+```
+
+Execution order
+
+```js
+Start
+End
+(file.txt content)
+```
+
 ## image
 
 ![image js-engine](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*TgK7W2VWsQJBcQawgDOSAg.png)
