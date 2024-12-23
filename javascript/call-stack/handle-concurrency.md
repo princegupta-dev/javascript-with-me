@@ -62,3 +62,7 @@ At any point, the thread can only execute one function (whichever is at the top 
 The thread executes JavaScript code.
 The Call Stack organizes and tracks function calls during this execution.
 JavaScript is single-threaded, but the Call Stack is part of the thread’s operation and helps manage the flow of function execution.
+
+## image
+
+![image js-engine](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*TgK7W2VWsQJBcQawgDOSAg.png)
