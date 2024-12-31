@@ -7,7 +7,7 @@ console.log(a); // undefined
 var a = 5;
 console.log(a); // 5
 ```
-
+/////
 ## this
 
 In JavaScript, this refers to the context in which a function is executed. Its value depends on how the function is called.
