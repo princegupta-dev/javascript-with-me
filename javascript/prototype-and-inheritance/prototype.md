@@ -79,3 +79,120 @@ const o = {
 
 console.log(o.d); // 5
 ```
+
+## Inheriting "methods"
+
+JavaScript does not have "methods" in the form that class-based languages define them. In JavaScript, any function can be added to an object in the form of a property. An inherited function acts just as any other property, including property shadowing as shown above (in this case, a form of method overriding).
+
+When an inherited function is executed, the value of this points to the inheriting object, not to the prototype object where the function is an own property.
+
+```js
+const parent = {
+  value: 2,
+  method() {
+    return this.value + 1;
+  },
+};
+
+console.log(parent.method()); // 3
+// When calling parent.method in this case, 'this' refers to parent
+
+// child is an object that inherits from parent
+const child = {
+  __proto__: parent,
+};
+console.log(child.method()); // 3
+// When child.method is called, 'this' refers to child.
+// So when child inherits the method of parent,
+// The property 'value' is sought on child. However, since child
+// doesn't have an own property called 'value', the property is
+// found on the [[Prototype]], which is parent.value.
+
+child.value = 4; // assign the value 4 to the property 'value' on child.
+// This shadows the 'value' property on parent.
+// The child object now looks like:
+// { value: 4, __proto__: { value: 2, method: [Function] } }
+console.log(child.method()); // 5
+// Since child now has the 'value' property, 'this.value' means
+// child.value instead
+```
+
+The reason the parent's value property is not updated to 4 when you set child.value = 4 is because of JavaScript's prototypal inheritance and property shadowing.
+
+Here's what's happening step by step:
+
+## child.**proto** = parent;
+
+child inherits from parent through the prototype chain.
+When you call child.method(), it looks for method in child. Since child doesn’t have it, it finds method on the prototype (parent).
+
+## 2. child.value = 4;
+
+This adds a new property value directly to child (own property).
+child now has its own value property separate from parent.value.
+This shadows the value property on parent.
+parent.value remains 2 because no direct modification is made to it.
+
+## Why Parent's Value Is Not Updated:
+
+Prototypes in JavaScript work by reference, but own properties on an object don't affect the prototype.
+When child.value = 4 is executed, JavaScript doesn't overwrite parent.value. Instead, it creates a new value property directly on child.
+
+## How this Works in method():
+
+When calling child.method(), this refers to child.
+this.value looks for the value property on child first. Since child has its own value, it uses that (4).
+If child didn't have value, it would fallback to parent.value through the prototype chain.
+
+Key Concept:
+Prototype properties are not updated when you set a value on an inheriting object.
+Only direct properties on the object are modified.
+
+## Shadowing
+
+Shadowing in JavaScript happens when a property or variable in a child scope (like inside a function or object) hides a property or variable with the same name in the outer (parent) scope.
+
+## How Shadowing Works:
+
+The inner (local) variable or property takes precedence over the outer (global) one.
+The outer variable/property is not overwritten—it still exists but is inaccessible directly from the inner scope while shadowed.
+
+```js
+let value = 10;
+
+function test() {
+  let value = 20; // Shadows the outer 'value'
+  console.log(value); // 20 (inner 'value' is used)
+}
+
+test();
+console.log(value); // 10 (outer 'value' remains unchanged)
+```
+
+## Example 2: Object Property Shadowing
+
+```js
+const parent = {
+  value: 2,
+  method() {
+    return this.value + 1;
+  },
+};
+
+const child = {
+  __proto__: parent,
+  value: 5, // Shadows 'value' from parent
+};
+
+console.log(child.method()); // 6 (child.value is used)
+console.log(parent.method()); // 3 (parent.value is used)
+```
+
+child shadows parent.value by defining its own value property.
+child.method() uses child.value, not parent.value.
+
+## Avoiding Shadowing Issues:
+
+Use const and let to reduce unintentional redeclaration.
+Unique variable names for inner scopes.
+Be mindful of this context when dealing with prototypes and inheritance.
