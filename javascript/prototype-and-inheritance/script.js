@@ -1,12 +1,16 @@
-function Person(name) {
-  this.name = name;
-}
+debugger;
 
-Person.prototype.greet = function () {
-  console.log(`Hello, my name is ${this.name}`);
+const parent = {
+  value: 2,
+  method() {
+    return this.value + 1;
+  },
 };
 
-const person1 = new Person("Prince");
-person1.greet(); // Output: Hello, my name is Prince
-console.log(person1.hasOwnProperty("name")); // true
-console.log(person1.hasOwnProperty("greet")); // false (inherited from prototype)
+console.log(parent.method());
+
+const child = {
+  __proto__: parent,
+};
+
+console.log(child.method());
