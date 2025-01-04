@@ -1,3 +1,24 @@
+With the introduction of ES6 (ECMAScript 2015), JavaScript added the class syntax, which provides a cleaner and more traditional way to work with objects and inheritance (similar to class-based OOP languages like Java, Python, etc.). However, it's important to note that even though JavaScript uses class syntax, it is still function-based under the hood.
+
+The class syntax is just a syntactic sugar (a more readable and modern way) on top of the function-based system.
+
+```js
+class Car {
+  constructor(model, color, year) {
+    this.model = model;
+    this.color = color;
+    this.year = year;
+  }
+
+  displayCarDetails() {
+    console.log(`${this.year} ${this.color} ${this.model}`);
+  }
+}
+
+const car1 = new Car("Tesla Model 3", "Red", 2023);
+car1.displayCarDetails(); // 2023 Red Tesla Model 3
+```
+
 # Prototypes & Inheritance
 
 In JavaScript, prototypes are the foundation of inheritance. Every object in JavaScript is linked to another object called its prototype. This forms a prototype chain that enables inheritance and shared methods across multiple objects.
@@ -196,3 +217,157 @@ child.method() uses child.value, not parent.value.
 Use const and let to reduce unintentional redeclaration.
 Unique variable names for inner scopes.
 Be mindful of this context when dealing with prototypes and inheritance.
+
+```js
+// Object literals (without the `__proto__` key) automatically
+// have `Object.prototype` as their `[[Prototype]]`
+const object = { a: 1 };
+Object.getPrototypeOf(object) === Object.prototype; // true
+
+// Array literals automatically have `Array.prototype` as their `[[Prototype]]`
+const array = [1, 2, 3];
+Object.getPrototypeOf(array) === Array.prototype; // true
+
+// RegExp literals automatically have `RegExp.prototype` as their `[[Prototype]]`
+const regexp = /abc/;
+Object.getPrototypeOf(regexp) === RegExp.prototype; // true
+```
+
+It may be interesting to note that due to historical reasons, some built-in constructors' prototype property are instances themselves. For example, Number.prototype is a number 0, Array.prototype is an empty array, and RegExp.prototype is /(?:)/.
+
+```js
+Number.prototype + 1; // 1
+Array.prototype.map((x) => x + 1); // []
+String.prototype + "a"; // "a"
+RegExp.prototype.source; // "(?:)"
+Function.prototype(); // Function.prototype is a no-op function by itself
+```
+
+However, this is not the case for user-defined constructors, nor for modern constructors like Map.
+
+```c
+Map.prototype.get(1);
+// Uncaught TypeError: get method called on incompatible Map.prototype
+```
+
+## Different ways of creating and mutating prototype chains
+
+We have encountered many ways to create objects and change their prototype chains. We will systematically summarize the different ways, comparing each approach's pros and cons.
+
+### Objects created with syntax constructs
+
+```js
+const o = { a: 1 };
+// The newly created object o has Object.prototype as its [[Prototype]]
+// Object.prototype has null as its [[Prototype]].
+// o ---> Object.prototype ---> null
+
+const b = ["yo", "sup", "?"];
+// Arrays inherit from Array.prototype
+// (which has methods indexOf, forEach, etc.)
+// The prototype chain looks like:
+// b ---> Array.prototype ---> Object.prototype ---> null
+
+function f() {
+  return 2;
+}
+// Functions inherit from Function.prototype
+// (which has methods call, bind, etc.)
+// f ---> Function.prototype ---> Object.prototype ---> null
+
+const p = { b: 2, __proto__: o };
+// It is possible to point the newly created object's [[Prototype]] to
+// another object via the __proto__ literal property. (Not to be confused
+// with Object.prototype.__proto__ accessors)
+// p ---> o ---> Object.prototype ---> null
+```
+
+## With constructor functions
+
+```js
+function Graph() {
+  this.vertices = [];
+  this.edges = [];
+}
+
+Graph.prototype.addVertex = function (v) {
+  this.vertices.push(v);
+};
+
+const g = new Graph();
+// g is an object with own properties 'vertices' and 'edges'.
+// g.[[Prototype]] is the value of Graph.prototype when new Graph() is executed.
+```
+
+Constructor functions have been available since very early JavaScript. Therefore, it is very fast, very standard, and very JIT-optimizable. However, it's also hard to "do properly" because methods added this way are enumerable by default, which is inconsistent with the class syntax or how built-in methods behave. Doing longer inheritance chains is also error-prone, as previously demonstrated.
+
+## With Object.create()
+
+Calling Object.create() creates a new object. The [[Prototype]] of this object is the first argument of the function:
+
+```js
+const a = { a: 1 };
+// a ---> Object.prototype ---> null
+
+const b = Object.create(a);
+// b ---> a ---> Object.prototype ---> null
+console.log(b.a); // 1 (inherited)
+
+const c = Object.create(b);
+// c ---> b ---> a ---> Object.prototype ---> null
+
+const d = Object.create(null);
+// d ---> null (d is an object that has null directly as its prototype)
+console.log(d.hasOwnProperty);
+// undefined, because d doesn't inherit from Object.prototype
+```
+
+Similar to the **proto** key in object initializers, Object.create() allows directly setting the prototype of an object at creation time, which permits the runtime to further optimize the object. It also allows the creation of objects with null prototype, using Object.create(null). The second parameter of Object.create() allows you to precisely specify the attributes of each property in the new object, which can be a double-edged sword:
+
+It allows you to create non-enumerable properties, etc., during object creation, which is not possible with object literals.
+It is much more verbose and error-prone than object literals.
+It may be slower than object literals, especially when creating many properties.
+
+## With classes
+
+```js
+class Rectangle {
+  constructor(height, width) {
+    this.name = "Rectangle";
+    this.height = height;
+    this.width = width;
+  }
+}
+
+class FilledRectangle extends Rectangle {
+  constructor(height, width, color) {
+    super(height, width);
+    this.name = "Filled rectangle";
+    this.color = color;
+  }
+}
+
+const filledRectangle = new FilledRectangle(5, 10, "blue");
+// filledRectangle ---> FilledRectangle.prototype ---> Rectangle.prototype ---> Object.prototype ---> null
+```
+
+## With Object.setPrototypeOf()
+
+While all methods above will set the prototype chain at object creation time, Object.setPrototypeOf() allows mutating the [[Prototype]] internal property of an existing object. It can even force a prototype on a prototype-less object created with Object.create(null) or remove the prototype of an object by setting it to null.
+
+```js
+const obj = { a: 1 };
+const anotherObj = { b: 2 };
+Object.setPrototypeOf(obj, anotherObj);
+// obj ---> anotherObj ---> Object.prototype ---> null
+```
+
+### Conclusion
+
+JavaScript may be a bit confusing for developers coming from Java or C++, as it's all dynamic, all runtime, and it has no static types at all. Everything is either an object (instance) or a function (constructor), and even functions themselves are instances of the Function constructor. Even the "classes" as syntax constructs are just constructor functions at runtime.
+
+All constructor functions in JavaScript have a special property called prototype, which works with the new operator. The reference to the prototype object is copied to the internal [[Prototype]] property of the new instance. For example, when you do const a1 = new A(), JavaScript (after creating the object in memory and before running function A() with this defined to it) sets a1.[[Prototype]] = A.prototype. When you then access properties of the instance, JavaScript first checks whether they exist on that object directly, and if not, it looks in [[Prototype]]. [[Prototype]] is looked at recursively, i.e. a1.doSomething, Object.getPrototypeOf(a1).doSomething, Object.getPrototypeOf(Object.getPrototypeOf(a1)).doSomething etc., until it's found or Object.getPrototypeOf returns null. This means that all properties defined on prototype are effectively shared by all instances, and you can even later change parts of prototype and have the changes appear in all existing instances.
+
+If, in the example above, you do const a1 = new A(); const a2 = new A();, then a1.doSomething would actually refer to Object.getPrototypeOf(a1).doSomething — which is the same as the A.prototype.doSomething you defined, i.e. Object.getPrototypeOf(a1).doSomething === Object.getPrototypeOf(a2).doSomething === A.prototype.doSomething.
+
+It is essential to understand the prototypal inheritance model before writing complex code that makes use of it. Also, be aware of the length of the prototype chains in your code and break them up if necessary to avoid possible performance problems. Further, the native prototypes should never be extended unless it is for the sake of compatibility with newer JavaScript features.
