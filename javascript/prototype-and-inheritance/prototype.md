@@ -362,6 +362,55 @@ Object.setPrototypeOf(obj, anotherObj);
 // obj ---> anotherObj ---> Object.prototype ---> null
 ```
 
+## Object.create()
+
+Object.create() in JavaScript is a method used to create a new object with a specified prototype. It's a fundamental part of JavaScript's prototype-based inheritance system.
+
+## syntax
+
+```js
+const obj = Object.create(prototype, propertiesObject);
+```
+
+## How Object.create() Works:
+
+It creates a new object and sets its prototype (**proto**) to the object passed as the first argument.
+This allows the new object to inherit directly from the specified object.
+
+### example
+
+```js
+const carPrototype = {
+  displayDetails() {
+    console.log(`${this.model} - ${this.color}`);
+  },
+};
+
+const car1 = Object.create(carPrototype);
+car1.model = "Tesla Model 3";
+car1.color = "Red";
+
+car1.displayDetails(); // Tesla Model 3 - Red
+```
+
+car1 inherits the displayDetails method from carPrototype.
+This is prototypal inheritance, a core concept in JavaScript.
+
+## Difference between proto and prototype
+
+**proto** is a reference to the prototype of the object instance. It points to the object that the instance inherits from.
+
+```js
+const car = {
+  wheels: 4,
+};
+
+const tesla = Object.create(car); // tesla's __proto__ points to car
+
+console.log(tesla.__proto__); // { wheels: 4 }
+console.log(tesla.wheels); // 4 (inherited from car)
+```
+
 ### Conclusion
 
 JavaScript may be a bit confusing for developers coming from Java or C++, as it's all dynamic, all runtime, and it has no static types at all. Everything is either an object (instance) or a function (constructor), and even functions themselves are instances of the Function constructor. Even the "classes" as syntax constructs are just constructor functions at runtime.
