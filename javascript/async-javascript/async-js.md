@@ -42,3 +42,5 @@ console.log(greeting);
 ```
 
 Here, makeGreeting() is a synchronous function because the caller has to wait for the function to finish its work and return a value before the caller can continue.
+
+////
