@@ -51,3 +51,95 @@ let obj = { a: 5 }; // Stored in heap (object reference)
 # Core Javascript
 
 ## 1. What are the differences between var, let, and const?
+
+**1. Scope Differences**
+**var** – Function-scoped
+Accessible throughout the entire function.
+If declared outside any function, it becomes global.
+**let** and **const** – Block-scoped
+Accessible only within the block **{}** where they are declared (like loops or conditionals).
+
+```js
+function test() {
+  if (true) {
+    var x = 10;
+    let y = 20;
+    const z = 30;
+  }
+  console.log(x); // 10
+  console.log(y); // ReferenceError
+  console.log(z); // ReferenceError
+}
+test();
+```
+
+**2. Re-declaration**
+**var** – Can be re-declared in the same scope.
+**let** and **const** – Cannot be re-declared in the same scope.
+
+```js
+var a = 1;
+var a = 2; // No error
+
+let b = 1;
+let b = 2; // Error: Identifier 'b' has already been declared
+
+const c = 1;
+const c = 2; // Error: Identifier 'c' has already been declared
+```
+
+**3. Hoisting Behavior**
+**var** – Hoisted to the top with undefined value.
+**let** and **const** – Hoisted but not initialized (Temporal Dead Zone - TDZ).
+
+```js
+console.log(x); // undefined
+var x = 10;
+
+console.log(y); // ReferenceError (TDZ)
+let y = 20;
+
+console.log(z); // ReferenceError (TDZ)
+const z = 30;
+```
+
+**4. Mutability**
+**var and let** – Can be reassigned.
+**const** – Cannot be reassigned. However, objects declared with const can have their properties modified.
+
+```js
+let a = 5;
+a = 10; // Works
+
+const b = 15;
+b = 20; // Error: Assignment to constant variable
+
+const obj = { key: "value" };
+obj.key = "newValue"; // Works (mutating object)
+```
+
+**5. Global Object Property**
+**var** – Attaches to the window object (in browsers).
+**let and const** – Do not attach to window.
+
+```js
+var a = 1;
+let b = 2;
+const c = 3;
+
+console.log(window.a); // 1
+console.log(window.b); // undefined
+console.log(window.c); // undefined
+```
+
+**6. Temporal Dead Zone (TDZ)**
+**let and const** stay in the TDZ from the start of the block until the declaration is encountered.
+ccessing variables during this period results in a ReferenceError.
+
+```js
+{
+  console.log(a); // ReferenceError
+  let a = 10;
+}
+``;
+```
