@@ -249,3 +249,181 @@ for (let i = 0; i < 3; i++) {
   });
 }
 ```
+
+## 2.Hoisting and Temporal Dead Zone (TDZ) in JavaScript
+
+Hoisting and the Temporal Dead Zone (TDZ) are critical JavaScript concepts that explain how variables and functions are accessed before they are declared.
+
+### 1. What is Hoisting?
+
+Hoisting is JavaScript’s behavior of moving variable and function declarations to the top of their containing scope during compilation.
+Only declarations are hoisted, not initializations (assignments).
+
+### 2. Temporal Dead Zone (TDZ)
+
+Definition: The time between when a variable is hoisted and when it is initialized.
+Accessing a variable in this zone results in a ReferenceError.
+TDZ only applies to let and const, not var.
+
+## Mutating Objects in const and Differences Between var, let, and const for Objects
+
+const only prevents reassignment of the variable itself, but the contents (properties) of the object can be changed.
+
+**Trying to Reassign the Whole Object (Error Example)**
+
+```js
+person = { name: "Jane" }; // TypeError: Assignment to constant variable
+```
+
+You cannot reassign the variable person to point to a different object.
+
+**2. Differences Between var, let, and const for Objects**
+**var**- functional scope, reassignment and re-declare
+**let** - block scope, no-redeclare, but can re assignments
+**const** - block scope, no reassign and re-declaration
+
+## 5. Preventing Mutation (Freezing Objects)
+
+```js
+const obj = Object.freeze({
+  name: "Alice",
+  age: 30,
+});
+
+obj.age = 35; // ❌ No effect (fails silently in non-strict mode)
+console.log(obj.age); // 30
+```
+
+## Question 2. Explain the concept of closures and provide an example.
+
+already explained in closure.md
+
+## 3. What are Web APIs in JavaScript?
+
+Web APIs are a collection of ready-to-use functions and interfaces provided by the browser (or Node.js environment) that allow JavaScript to interact with external resources, handle asynchronous tasks, and manipulate the browser environment.
+
+They enable JavaScript to perform tasks that it cannot handle natively (like timers, HTTP requests, DOM manipulation, etc.).
+**How Web APIs Work:**
+JavaScript calls a Web API function (e.g., setTimeout or fetch).
+The task is delegated to the browser’s Web API, and JavaScript continues executing other code (non-blocking).
+Once the task completes, the Web API sends the result to the callback queue or microtask queue.
+The event loop pushes the callback to the call stack when it's empty.
+
+## Question 4- How does the JavaScript event loop work?
+
+The event loop is the mechanism that allows JavaScript to handle asynchronous operations, enabling non-blocking execution even though JavaScript is single-threaded.
+
+**Key Concepts to Understand:**
+
+1. Single-threaded Nature
+   JavaScript executes code line by line on a single thread (one operation at a time).
+   To avoid blocking the main thread, JavaScript uses asynchronous callbacks and promises.
+2. Call Stack
+   A LIFO (Last In, First Out) data structure that tracks the execution of synchronous code.
+   When a function is invoked, it’s pushed to the stack. Once it finishes, it’s popped off. 3. Web APIs / Node APIs
+
+- Asynchronous tasks (like setTimeout, fetch, DOM events) are delegated to Web APIs (browser) or Node APIs (in Node.js).
+  These APIs handle tasks separately and send the result back to JavaScript when ready.
+  Callback Queue (Task Queue) 4. Callback Queue (Task Queue)
+- Callbacks from asynchronous tasks (e.g., setTimeout, event listeners) are queued here.
+  The queue follows FIFO (First In, First Out) order.
+- Microtask Queue 5. Microtask Queue
+  Microtasks include Promise.then(), MutationObserver, queueMicrotask().
+  This queue has higher priority than the callback queue (macro-task queue). 6. Event Loop
+- The event loop continuously monitors the call stack and task queues.
+  If the call stack is empty, the event loop pushes the next callback from the queue to the stack for execution.
+
+**Flow of the Event Loop:**
+
+- Execute all synchronous code in the call stack.
+- If there is an asynchronous task, delegate it to the Web API.
+- Once the task completes, its callback is added to the task queue (or microtask queue).
+- The event loop checks if the call stack is empty.
+- If the stack is empty, the next callback from the microtask queue is pushed onto the stack.
+- After all microtasks, the event loop picks the next macro-task (like setTimeout or setInterval).
+
+## Example – Event Loop in Action:
+
+```js
+console.log("Start");
+
+setTimeout(() => {
+  console.log("Timeout callback");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("Promise callback");
+});
+
+console.log("End");
+```
+
+**Execution Flow (Step by Step):**
+
+1. Call Stack:
+   **console.log('Start')** → Prints Start.
+   **setTimeout()** is called → Asynchronous, moved to the Web API (delayed to queue).
+   **Promise.resolve()** is called → Microtask (added to microtask queue).
+   **console.log('End')** → Prints End.
+2. Microtask Execution:
+
+Promise callback from the microtask queue is executed (prints Promise callback).
+**3. Task Queue Execution:**
+Timeout callback from the task queue is executed (prints Timeout callback).
+
+**Where is the Pending State Stored**
+The pending state of a Promise (like the one returned by fetch) is stored in JavaScript's memory/heap—managed internally by the JavaScript engine.
+The Promise has an internal hidden property ([[PromiseState]]) that stores its current state (pending, fulfilled, or rejected).
+
+## 5. What is the difference between null and undefined?
+
+The difference between null and undefined in JavaScript is subtle but significant. Both represent the absence of a value, but they are used in different contexts and have different meanings.
+**undefined**
+undefined is a primitive value automatically assigned to a variable that has been declared but not assigned a value.
+**When it is used:**
+If a variable is declared but not initialized
+
+```js
+let x;
+console.log(x); // Output: undefined
+```
+
+When a function does not explicitly return a value:
+
+```js
+function test() {}
+console.log(test()); // Output: undefined
+```
+
+When you try to access a property that doesn't exist in an object:
+
+```js
+const obj = { name: "Alice" };
+console.log(obj.age); // Output: undefined
+```
+
+Type of **undefined**:
+typeof **undefined** is **'undefined'**
+
+## 2. null
+
+null is a primitive value explicitly assigned to a variable to represent the absence of any object or value. It is an intentional assignment to indicate "no value."
+
+```js
+let person = null; // person has no value, it's intentionally empty
+console.log(person); // Output: null
+```
+
+Type of **null**:
+
+typeof null is 'object', which is a known JavaScript quirk. This was a bug in the language that has been retained for backward compatibility.
+
+\*\*Example of Comparison
+
+```js
+let x;
+let y = null;
+
+console.log(x == y); // true (because both are "empty")
+console.log(x === y); // false (different types: undefined vs object)
+```
