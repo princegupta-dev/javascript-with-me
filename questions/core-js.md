@@ -143,3 +143,109 @@ ccessing variables during this period results in a ReferenceError.
 }
 ``;
 ```
+
+**7. Use Cases**
+**var** – Rarely used in modern JavaScript (legacy code).
+**let** – Use when the value can change (e.g., loops, counters).
+**const** – Default choice. Use when the value should not change (e.g., constants, configurations).
+
+**1. Loops (Block Scope vs. Function Scope)**
+
+### Example with **var**
+
+```js
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i); // 3, 3, 3
+  }, 1000);
+}
+```
+
+### Why?
+
+var is function-scoped, so the same i is shared across all iterations.
+By the time the setTimeout runs, the loop has already finished, and i is 3.
+
+**Example with let**
+
+```js
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i); // 0, 1, 2
+  }, 1000);
+}
+```
+
+### Why?
+
+let is block-scoped. Each iteration creates a new i that is unique to that block.
+When setTimeout runs, it remembers the i from its respective iteration (closure behavior).
+
+### 2. Fixing var with Closures
+
+If you have to use var for some reason, you can fix the issue by using an IIFE (Immediately Invoked Function Expression) to create a new scope:
+
+```js
+for (var i = 0; i < 3; i++) {
+  (function (j) {
+    setTimeout(() => {
+      console.log(j); // 0, 1, 2
+    }, 1000);
+  })(i);
+}
+```
+
+The IIFE creates a new function scope for each iteration, capturing the current value of i by passing it as j.
+
+**3. Asynchronous Behavior with let and var**
+
+### Example 1 – var with setTimeout
+
+```js
+var count = 5;
+setTimeout(() => {
+  var count = 10;
+  console.log(count); // 10
+}, 1000);
+console.log(count); // 5
+```
+
+**Why?**
+The count inside the setTimeout is a different count (function-scoped).
+The outer count (5) remains unaffected.
+
+**Example 2 – let with Asynchronous Code**
+
+```js
+let count = 5;
+setTimeout(() => {
+  let count = 10;
+  console.log(count); // 10
+}, 1000);
+console.log(count); // 5
+```
+
+Why?
+let keeps the inner count block-scoped within setTimeout.
+The outer count remains 5 and is unaffected by the inner declaration.
+
+## 4. Practical Example – Event Listeners (Var vs. Let)
+
+```js
+for (var i = 0; i < 3; i++) {
+  document.body.addEventListener("click", () => {
+    console.log(i); // Always 3
+  });
+}
+```
+
+Issue: Every click will log 3.
+Fix with let:
+
+```js
+for (let i = 0; i < 3; i++) {
+  document.body.addEventListener("click", () => {
+    console.log(i); // Logs 0, 1, 2 in respective order
+  });
+}
+```
