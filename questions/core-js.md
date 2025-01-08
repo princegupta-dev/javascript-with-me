@@ -375,7 +375,7 @@ Timeout callback from the task queue is executed (prints Timeout callback).
 The pending state of a Promise (like the one returned by fetch) is stored in JavaScript's memory/heap—managed internally by the JavaScript engine.
 The Promise has an internal hidden property ([[PromiseState]]) that stores its current state (pending, fulfilled, or rejected).
 
-## 5. What is the difference between null and undefined?
+## Question 5. What is the difference between null and undefined?
 
 The difference between null and undefined in JavaScript is subtle but significant. Both represent the absence of a value, but they are used in different contexts and have different meanings.
 **undefined**
@@ -427,3 +427,110 @@ let y = null;
 console.log(x == y); // true (because both are "empty")
 console.log(x === y); // false (different types: undefined vs object)
 ```
+
+## Question 6. How do you implement debouncing and throttling in JavaScript?
+
+described in debounce and throttling folder.
+
+## Question 7. Explain the difference between == and ===.
+
+**1. == (Loose Equality or Abstract Equality):**
+
+- Compares values for equality after type conversion (coercion) if the types are different.
+- It attempts to convert the operands to the same type before making the comparison.
+
+```js
+console.log(5 == "5"); // true  (string '5' is coerced to number 5)
+console.log(false == 0); // true  (false is coerced to 0)
+console.log(null == undefined); // true (special case in JS)
+console.log(1 == true); // true  (true is coerced to 1)
+console.log("0" == false); // true  (both are coerced to 0)
+```
+
+**2. === (Strict Equality):**
+
+- Compares both value and type without type conversion.
+- If the types are different, it immediately returns false.
+
+```js
+console.log(5 === "5"); // false (different types: number vs string)
+console.log(false === 0); // false (different types: boolean vs number)
+console.log(null === undefined); // false (different types)
+console.log(1 === true); // false (different types)
+console.log("0" === false); // false (string vs boolean)
+```
+
+**Why Use === Over ==?**
+
+- === is generally recommended because it avoids unexpected results from type coercion.
+- It ensures more predictable and bug-free comparisons.
+  **Example of Potential Pitfall with ==:**
+
+```js
+let userInput = "0";
+if (userInput == false) {
+  console.log("User input is falsey"); // This will run (unexpected)
+}
+```
+
+**Using ===**
+
+```js
+if (userInput === false) {
+  console.log("User input is falsey"); // This will not run (expected)
+}
+```
+
+This avoids the pitfall since the types are different **(string !== boolean)**.
+
+**Special Cases with == (Type Coercion Rules):**
+
+- **null == undefined** → true **(but null !== undefined)**
+- **NaN == NaN** → false (NaN is not equal to itself)
+- **0 == false** → **true**
+- **[] == false** → true (empty array coerced to **false**)
+
+## When to Use ==?
+
+- Rarely. Use it only if type coercion is explicitly desired and necessary.
+
+```js
+if (value == null) {
+    // This checks
+```
+
+both null and undefined without explicitly checking each: console.log('Value is null or undefined'); }
+
+**Type Coercion in JavaScript**
+Type coercion is the process of automatically converting one data type to another during operations involving values of different types. JavaScript is a loosely typed language, which means you can perform operations between different types, and the language will try to convert them to compatible types.
+
+### Types of Coercion:
+
+- Implicit Coercion (Automatic by JS)
+- Explicit Coercion (Manual by Developer)
+
+### Implicit Coercion (Automatic):
+
+```js
+console.log("5" - 2); // 3  ('5' is coerced to number)
+console.log("5" + 2); // '52' (2 is coerced to string)
+console.log(true + 1); // 2  (true is coerced to 1)
+console.log(false + 1); // 1  (false is coerced to 0)
+console.log("5" * "3"); // 15 ('5' and '3' are coerced to numbers)
+```
+
+Explanation:
+
+**- , \* , / , %** trigger numeric coercion.
+**+** triggers string coercion if one operand is a string.
+
+### 2. Explicit Coercion (Manual):
+
+```js
+console.log(Number("5")); // 5
+console.log(String(123)); // '123'
+console.log(Boolean(1)); // true
+console.log(Boolean(0)); // false
+```
+
+## Question 8. What are promises, and how do they differ from callbacks?
