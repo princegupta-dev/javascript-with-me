@@ -1,13 +1,10 @@
-debugger;
-
-function test() {
-  if (true) {
-    var x = 10;
-    let y = 20;
-    const z = 30;
-  }
-  console.log(x); // 10
-  console.log(y); // ReferenceError
-  console.log(z); // ReferenceError
+function createLeak() {
+  const largeArray = new Array(100000).fill("leak");
+  return function () {
+    console.log(largeArray[0]);
+  };
 }
-test();
+
+let leak = createLeak();
+// leak = null;
+// The `largeArray` is still referenced by the closure, even though we don't need it anymore.
