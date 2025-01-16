@@ -534,3 +534,318 @@ console.log(Boolean(0)); // false
 ```
 
 ## Question 8. What are promises, and how do they differ from callbacks?
+
+## Question 9. How do async and await work in JavaScript?
+
+## Question 10. What is the purpose of the bind(), call(), and apply() methods?
+
+The concepts of **bind(), call(),** and **apply()** in JavaScript are used to control the **this** context in functions.
+
+- **bind():**
+  Creates a new function with a specific this context. Use it when you need to pass a function to be called later with a fixed this.
+  Example: Assigning methods to event handlers.
+
+```js
+const obj = { name: "Alice" };
+function greet(greeting) {
+  return `${greeting}, ${this.name}`;
+}
+const boundGreet = greet.bind(obj, "Hello");
+console.log(boundGreet()); // "Hello, Alice"
+```
+
+- **call():**
+  Invokes a function immediately with a specified this context and individual arguments.
+
+```js
+const obj = { name: "Alice" };
+function greet(greeting) {
+  return `${greeting}, ${this.name}`;
+}
+console.log(greet.call(obj, "Hi")); // "Hi, Alice"
+```
+
+- **apply()**
+  Similar to call(), but takes arguments as an array.
+
+```js
+const obj = { name: "Alice" };
+function greet(greeting) {
+  return `${greeting}, ${this.name}`;
+}
+console.log(greet.apply(obj, ["Hey"])); // "Hey, Alice"
+```
+
+## Question 11. How would you deep clone an object in JavaScript?
+
+To deep clone an object in JavaScript (i.e., create a new object that is a complete copy of the original, including nested objects), you can use the following methods:
+
+### 1. Using structuredClone() (Modern Approach)
+
+The built-in structuredClone() method is the most efficient and straightforward way to deep clone objects.
+
+```js
+const original = { name: "Alice", address: { city: "Wonderland" } };
+const clone = structuredClone(original);
+
+console.log(clone); // { name: "Alice", address: { city: "Wonderland" } }
+console.log(clone.address === original.address); // false (different objects)
+```
+
+Advantages: Handles nested objects, arrays, and circular references.
+Limitation: Not supported in older browsers.
+
+### 2. Using JSON.parse(JSON.stringify())
+
+This method serializes and deserializes the object.
+
+```javascript
+const original = { name: "Alice", address: { city: "Wonderland" } };
+const clone = JSON.parse(JSON.stringify(original));
+
+console.log(clone); // { name: "Alice", address: { city: "Wonderland" } }
+console.log(clone.address === original.address); // false (different objects)
+```
+
+Advantages: Easy to use and works for simple objects.
+Limitations: Fails with:
+Non-JSON-compatible values (e.g., undefined, functions, symbols).
+Circular references.
+
+### 3. Using Lodash Library
+
+The lodash library provides a cloneDeep() function for deep cloning.
+
+```js
+const _ = require("lodash");
+
+const original = { name: "Alice", address: { city: "Wonderland" } };
+const clone = _.cloneDeep(original);
+
+console.log(clone); // { name: "Alice", address: { city: "Wonderland" } }
+console.log(clone.address === original.address); // false (different objects)
+```
+
+Advantages: Reliable and handles complex structures like circular references.
+Limitation: Requires installing a library.
+
+### 4. Manual Recursive Cloning
+
+You can write a custom function to recursively clone objects.
+
+```javascript
+function deepClone(obj) {
+  if (obj === null || typeof obj !== "object") return obj;
+
+  const clone = Array.isArray(obj) ? [] : {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key]);
+    }
+  }
+  return clone;
+}
+
+const original = { name: "Alice", address: { city: "Wonderland" } };
+const clone = deepClone(original);
+
+console.log(clone); // { name: "Alice", address: { city: "Wonderland" } }
+console.log(clone.address === original.address); // false (different objects)
+```
+
+## Question 12. Timer Function
+
+In JavaScript, timers are functions that execute code after a specified delay or repeatedly at a specified interval. The two main timer functions are:
+
+**1. setTimeout**
+Executes a function once after a specified number of milliseconds.
+
+```js
+const timeoutId = setTimeout(callback, delay, ...args);
+```
+
+- callback: The function to execute.
+- delay: Time in milliseconds before executing the callback.
+- ...args: Optional parameters passed to the callback.
+
+```javascript
+setTimeout(() => {
+  console.log("Executed after 2 seconds");
+}, 2000);
+```
+
+### Stopping a Timer
+
+```javascript
+const timeoutId = setTimeout(() => {
+  console.log("This will not execute");
+}, 3000);
+
+clearTimeout(timeoutId); // Cancels the timeout
+```
+
+## 2. setInterval
+
+Executes a function repeatedly at specified intervals.
+
+```js
+const intervalId = setInterval(callback, delay, ...args);
+```
+
+- callback: The function to execute repeatedly.
+- delay: Time in milliseconds between each execution.
+- ...args: Optional parameters passed to the callback.
+
+```javascript
+const intervalId = setInterval(() => {
+  console.log("This message appears every second");
+}, 1000);
+```
+
+### Stopping an Interval
+
+```javascript
+const intervalId = setInterval(() => {
+  console.log("This will run multiple times");
+}, 1000);
+
+setTimeout(() => {
+  clearInterval(intervalId); // Stops the interval after 5 seconds
+  console.log("Interval cleared");
+}, 5000);
+```
+
+## Question 13. All About DATE and Time
+
+JavaScript provides powerful tools for working with date and time through the built-in Date object. Here's a comprehensive guide to understanding and using date and time in JavaScript.
+
+## 1.1 Current Date and Time
+
+```javascript
+const now = new Date();
+console.log(now); // Outputs the current date and time
+```
+
+### 1.2 Specific Date and Time
+
+```javascript
+const specificDate = new Date("2025-01-01T10:00:00");
+console.log(specificDate); // Outputs: Wed Jan 01 2025 10:00:00 GMT+0000
+
+const anotherDate = new Date(2025, 0, 1, 10, 0, 0); // Year, Month (0-based), Day, Hours, Minutes, Seconds
+console.log(anotherDate); // Outputs: Wed Jan 01 2025 10:00:00 GMT+0000
+```
+
+### 1.3 From Timestamps
+
+```javascript
+const timestampDate = new Date(1672531200000); // Milliseconds since January 1, 1970
+console.log(timestampDate);
+```
+
+### 1.4 Epoch Date
+
+```javascript
+const epoch = new Date(0); // January 1, 1970
+console.log(epoch);
+```
+
+## 2. Date Methods
+
+```javascript
+const now = new Date();
+
+console.log(now.getFullYear()); // Year (e.g., 2025)
+console.log(now.getMonth()); // Month (0 = January, 11 = December)
+console.log(now.getDate()); // Day of the month (1-31)
+console.log(now.getDay()); // Day of the week (0 = Sunday, 6 = Saturday)
+console.log(now.getHours()); // Hour (0-23)
+console.log(now.getMinutes()); // Minutes (0-59)
+console.log(now.getSeconds()); // Seconds (0-59)
+console.log(now.getMilliseconds()); // Milliseconds (0-999)
+console.log(now.getTime()); // Timestamp in milliseconds since January 1, 1970
+```
+
+### 2.2 Setting Components
+
+```javascript
+const now = new Date();
+
+now.setFullYear(2023);
+now.setMonth(11); // December
+now.setDate(25); // 25th
+now.setHours(10, 30, 0); // 10:30:00
+
+console.log(now);
+```
+
+## 3. Formatting Dates
+
+```js
+const now = new Date();
+
+console.log(now.toDateString()); // Human-readable date (e.g., "Fri Jan 10 2025")
+console.log(now.toTimeString()); // Time (e.g., "10:45:30 GMT+0000")
+console.log(now.toISOString()); // ISO format (e.g., "2025-01-10T10:45:30.000Z")
+console.log(now.toLocaleDateString()); // Localized date (e.g., "1/10/2025")
+console.log(now.toLocaleTimeString()); // Localized time (e.g., "10:45:30 AM")
+console.log(now.toLocaleString()); // Localized date and time (e.g., "1/10/2025, 10:45:30 AM")
+```
+
+## 4. Comparing Dates
+
+```javascript
+const date1 = new Date("2025-01-01");
+const date2 = new Date("2025-01-10");
+
+console.log(date1 > date2); // false
+console.log(date1 < date2); // true
+console.log(date1.getTime() === date2.getTime()); // false
+```
+
+## 5. Calculating Date Differences
+
+```javascript
+const date1 = new Date("2025-01-01");
+const date2 = new Date("2025-01-10");
+
+const diffTime = Math.abs(date2 - date1); // Difference in milliseconds
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert to days
+console.log(diffDays); // Outputs: 9
+```
+
+## 6. Working with Timezones
+
+JavaScript automatically uses the user's local timezone, but you can work with UTC or specific timezones.
+
+```js
+const now = new Date();
+
+console.log(now.getUTCFullYear()); // UTC Year
+console.log(now.getUTCMonth()); // UTC Month
+console.log(now.toISOString()); // ISO 8601 with UTC
+```
+
+### 6.2 Timezone Offsets
+
+```js
+const now = new Date();
+console.log(now.getTimezoneOffset()); // Difference in minutes from UTC
+```
+
+## 1. What is UTC?
+
+- UTC (Coordinated Universal Time) is the primary time standard by which the world regulates clocks and time. It does not change with seasons or daylight saving time.
+- It serves as a universal reference for timekeeping.
+
+## 2. What is ISO 8601 Format?
+
+- ISO 8601 is an international standard for date and time representation.
+- It can represent time in local time (with or without time zone offsets) or in UTC.
+- UTC Example: 2025-01-10T12:00:00Z
+- With Offset Example: 2025-01-10T12:00:00+05:30 (India Standard Time, 5 hours 30 minutes ahead of UTC)
+
+## 3. Timezones
+
+- A timezone is a geographical region that has the same standard time.
+- Timezones are defined as offsets from UTC, such as +05:30 or -08:00.
