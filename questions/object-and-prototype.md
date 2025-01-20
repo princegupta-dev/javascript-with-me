@@ -43,3 +43,5 @@ const person1 = new Person("Alice", 30);
 person1.greet(); // "Hello, my name is Alice."
 Person.info(); // "This is a static method."
 ```
+
+## Question 4. How would you implement a mixin pattern in JavaScript?
