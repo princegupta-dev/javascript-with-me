@@ -25,7 +25,7 @@ CSRF Tokens (Anti-CSRF Tokens): The most common and effective way to prevent CSR
 - The user submits the form (or makes a request), including the CSRF token.
 - The server verifies that the token is valid and matches the one sent previously.
 - If the token is invalid or missing, the server rejects the request.
-
+//////
 ```js
 const express = require("express");
 const csrf = require("csurf");
